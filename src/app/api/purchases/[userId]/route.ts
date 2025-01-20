@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
-  const { userId } = await params;
+  const { userId } = context.params;
 
   try {
     const purchases = await prisma.purchase.findMany({
