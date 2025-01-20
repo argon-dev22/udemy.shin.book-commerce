@@ -6,34 +6,61 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
 import { BookType } from "@/types/book";
-// import Link from "next/link";
 
 type BookProps = {
   book: BookType;
+  isPurchased: boolean;
 };
 
-const Book = ({ book }: BookProps) => {
+const Book = ({ book, isPurchased }: BookProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
 
   const handleOpenModal = () => {
+    if (isPurchased) {
+      alert("すでに購入済みです");
+      return;
+    }
     setIsModalOpen(true);
   };
 
-  const handlePurchase = () => {
+  const handlePurchase = async () => {
     if (!session) {
       setIsModalOpen(false);
-      alert("ログインしてください");
+      alert("購入するにはログインしてください");
       router.push("/login");
       return;
     }
-
-    alert("TODO: 購入処理");
+    handleCheckout();
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_ORIGIN}/api/checkout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: book.title,
+            price: book.price,
+            bookId: book.id,
+            userId: (session?.user as { id: string }).id,
+          }),
+        }
+      );
+      const result = await response.json();
+      router.push(result.url);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -66,6 +93,7 @@ const Book = ({ book }: BookProps) => {
             alt={book.title}
             width={450}
             height={350}
+            style={{ width: "auto", height: "auto" }}
             className="rounded-t-md"
           />
           <div className="px-4 py-4 bg-slate-100 rounded-b-md">

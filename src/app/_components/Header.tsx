@@ -1,13 +1,15 @@
-"use client";
-
-import { useSession, signOut } from "next-auth/react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { getServerSession } from "next-auth";
 
-const Header = () => {
-  const { data: session } = useSession();
-  const user = session?.user;
+import { nextAuthOptions } from "@/lib/next-auth/options";
+import { UserType } from "@/types/user";
+import SignOutButton from "./SignOutButton";
+
+export default async function Header() {
+  const session = await getServerSession(nextAuthOptions);
+  const user = session?.user as UserType;
   const navCss =
     "text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium";
 
@@ -22,19 +24,14 @@ const Header = () => {
             ホーム
           </Link>
           {session ? (
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className={navCss}
-            >
-              ログアウト
-            </button>
+            <SignOutButton navCss={navCss} />
           ) : (
             <Link href="/login" className={navCss}>
               ログイン
             </Link>
           )}
 
-          <Link href={`/profile`}>
+          <Link href="/profile">
             <Image
               width={50}
               height={50}
@@ -46,6 +43,4 @@ const Header = () => {
       </nav>
     </header>
   );
-};
-
-export default Header;
+}
