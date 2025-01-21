@@ -34,6 +34,7 @@ export default async function Home() {
             key={book.id}
             book={book}
             isPurchased={purchasedBookIds.includes(book.id)}
+            session={session}
           />
         );
       })}

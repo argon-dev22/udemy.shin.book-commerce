@@ -3,18 +3,18 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
 import { BookType } from "@/types/book";
 
 type BookProps = {
   book: BookType;
   isPurchased: boolean;
+  session: Session | null;
 };
 
-const Book = ({ book, isPurchased }: BookProps) => {
+const Book = ({ book, isPurchased, session }: BookProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: session } = useSession();
   const router = useRouter();
 
   const handleOpenModal = () => {
@@ -65,7 +65,6 @@ const Book = ({ book, isPurchased }: BookProps) => {
 
   return (
     <>
-      {/* アニメーションスタイル */}
       <style jsx global>{`
         @keyframes fadeIn {
           from {
